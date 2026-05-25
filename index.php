@@ -53,11 +53,65 @@ if (isset($_SESSION['role'])) {
       padding: 8px;
       text-align: center;
       font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      position: relative;
+    }
+
+    .demo-chip:hover {
+      border-color: #92400e;
+      background: #fde8cc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(146, 64, 14, 0.08);
+    }
+
+    .demo-chip.copied {
+      border-color: #16a34a;
+      background: #dcfce7;
     }
 
     .demo-chip-role {
       font-weight: 700;
       margin-bottom: 2px;
+    }
+
+    .demo-chip-user {
+      font-family: monospace;
+      font-size: 10px;
+      color: #374151;
+    }
+
+    .demo-chip-pass {
+      font-size: 10px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .demo-chip-hint {
+      font-size: 9px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1f2937;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
@@ -92,36 +146,68 @@ if (isset($_SESSION['role'])) {
       </div>
 
       <div class="card p-3">
-        <div style="font-size:11px;font-weight:600;color:#a07850;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;text-align:center">Demo Akun</div>
+        <div
+          style="font-size:11px;font-weight:600;color:#a07850;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;text-align:center">
+          Demo Akun <span style="font-weight:400;color:#9ca3af">(klik untuk isi form)</span></div>
         <div class="row g-2 justify-content-center">
-          <div class="col-4">
-            <div class="demo-chip">
-              <div class="demo-chip-role" style="color:#92400e">Admin</div>
-              <div>user_admin</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="demo-chip">
-              <div class="demo-chip-role" style="color:#1d4ed8">Kasir</div>
-              <div>user_kasir</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="demo-chip">
-              <div class="demo-chip-role" style="color:#a16207">Dapur</div>
-              <div>user_dapur</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="demo-chip">
+          <div class="col-6">
+            <div class="demo-chip" onclick="fillLogin('user_owner','1234')">
               <div class="demo-chip-role" style="color:#a16207">Owner</div>
-              <div>user_owner</div>
+              <div class="demo-chip-user">user_owner</div>
+              <div class="demo-chip-pass">pass: 1234</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="demo-chip" onclick="fillLogin('user_admin','1234')">
+              <div class="demo-chip-role" style="color:#92400e">Admin</div>
+              <div class="demo-chip-user">user_admin</div>
+              <div class="demo-chip-pass">pass: 1234</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="demo-chip" onclick="fillLogin('user_kasir','1234')">
+              <div class="demo-chip-role" style="color:#1d4ed8">Kasir</div>
+              <div class="demo-chip-user">user_kasir</div>
+              <div class="demo-chip-pass">pass: 1234</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="demo-chip" onclick="fillLogin('user_dapur','1234')">
+              <div class="demo-chip-role" style="color:#059669">Dapur</div>
+              <div class="demo-chip-user">user_dapur</div>
+              <div class="demo-chip-pass">pass: 1234</div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Toast notification -->
+      <div class="copy-toast" id="copyToast">✓ Akun diisi ke form</div>
     </div>
   </div>
+
+  <script>
+    function fillLogin(username, password) {
+      const usernameInput = document.querySelector('input[name="username"]');
+      const passwordInput = document.querySelector('input[name="password"]');
+
+      if (usernameInput) usernameInput.value = username;
+      if (passwordInput) passwordInput.value = password;
+
+      // Highlight the clicked chip
+      document.querySelectorAll('.demo-chip').forEach(el => el.classList.remove('copied'));
+      event.currentTarget.classList.add('copied');
+      setTimeout(() => event.currentTarget.classList.remove('copied'), 1200);
+
+      // Show toast
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+
+      // Focus on submit button
+      usernameInput.focus();
+    }
+  </script>
 </body>
 
 </html>

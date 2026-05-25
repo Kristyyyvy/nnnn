@@ -11,6 +11,14 @@ if (!$pesanan) {
   exit;
 }
 
+// Update nama_kasir jika kosong berdasarkan username yang login
+if (empty($pesanan['nama_kasir']) && !empty($_SESSION['username'])) {
+  $logged_in_user = $_SESSION['username'];
+  mysqli_query($koneksi, "UPDATE tb_pesanan SET nama_kasir = '" . mysqli_real_escape_string($koneksi, $logged_in_user) . "' WHERE id_pesanan = $id");
+  $pesanan['nama_kasir'] = $logged_in_user;
+}
+
+
 $details = mysqli_query(
   $koneksi,
   "SELECT d.jumlah, d.subtotal, m.nama_menu, m.harga
@@ -170,7 +178,7 @@ while ($d = mysqli_fetch_assoc($details)) $rows[] = $d;
     <div class="info-row"><span>Tanggal</span><span><?= $pesanan['tgl_pesanan'] ?></span></div>
     <div class="info-row"><span>Pelanggan</span><span><?= htmlspecialchars($pesanan['nama_pelanggan']) ?></span></div>
     <div class="info-row"><span>No. Meja</span><span><?= $pesanan['no_meja'] ?></span></div>
-    <div class="info-row"><span>Nama Kasir</span><span><?= htmlspecialchars($pesanan['nama_kasir']) ?></span></div>
+    <div class="info-row"><span>Nama Kasir</span><span><?= htmlspecialchars(!empty($pesanan['nama_kasir']) ? $pesanan['nama_kasir'] : ($_SESSION['username'] ?? '-')) ?></span></div>
     <div class="info-row"><span>Metode Bayar</span><span><?= htmlspecialchars($pesanan['metode_bayar'] ?? 'tunai') ?></span></div>
 
     <hr class="garis">

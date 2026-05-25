@@ -1,16 +1,23 @@
 <?php 
+include '../auth.php';
+checkRole(['admin']);
 include '../connect.php';
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = intval($_GET['id']);
     
-    $query = "DELETE FROM tb_menu WHERE id_menu = '$id'";
-    $result = mysqli_query($koneksi, $query);
+    $stmt = mysqli_prepare($koneksi, "DELETE FROM tb_menu WHERE id_menu = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    $result = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
 
     if ($result) {
-        echo "<script>alert('Menu berhasil dihapus!'); window.location='../../admin.php';</script>";
+        echo "<script>alert('Menu berhasil dihapus!'); window.location='../../admin.php?tab=menu';</script>";
     } else {
-        echo "Gagal menghapus menu: " . mysqli_error($koneksi);
+        echo "<script>alert('Gagal menghapus menu!'); window.location='../../admin.php?tab=menu';</script>";
     }
+} else {
+    header("Location: ../../admin.php");
+    exit;
 }
 ?>

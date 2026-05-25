@@ -55,7 +55,8 @@ $cnt = $result ? mysqli_num_rows($result) : 0;
                     </div>
                     <div class="kc-card-body" style="padding:12px 14px">
                         <?php
-                        $d = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah, m.nama_menu, d.catatan FROM tb_detail_pesanan d JOIN tb_menu m ON d.id_menu = m.id_menu WHERE d.id_pesanan='{$row['id_pesanan']}'");
+                        $detail_id = intval($row['id_pesanan']);
+                        $d = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah, m.nama_menu, d.catatan FROM tb_detail_pesanan d JOIN tb_menu m ON d.id_menu = m.id_menu WHERE d.id_pesanan=$detail_id");
                         while ($item = mysqli_fetch_assoc($d)):
                         ?>
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">

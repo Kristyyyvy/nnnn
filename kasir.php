@@ -301,7 +301,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
       total += sub;
       html += `<div class="cart-row">
         <div class="cart-row-main"><span>${i.nama} ×${i.qty}</span><span style="color:#92400e;font-weight:600">${rp(sub)}</span></div>
-        <input type="text" class="form-control form-control-sm mt-1" placeholder="Catatan..." value="${i.catatan}" oninput="updateCatatan(${i.id}, this.value)">
+        <input type="text" class="form-control form-control-sm mt-1" placeholder="Catatan..." value="${(i.catatan||'').replace(/"/g,'&quot;')}" oninput="updateCatatan(${i.id}, this.value)">
       </div>`;
     });
     list.innerHTML = html;

@@ -224,12 +224,14 @@ include '_layout.php';
 <?php elseif ($tab === 'laporan'): ?>
 
 <?php
-// Date filter for laporan
+// Date filter for laporan — dengan prepared statement
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
-$filter_clause = '';
-if ($start_date && $end_date) {
-    $filter_clause = "WHERE tgl_pesanan BETWEEN '$start_date' AND '$end_date'";
+$has_filter = false;
+
+// Validasi format tanggal (YYYY-MM-DD)
+if ($start_date && $end_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $end_date)) {
+    $has_filter = true;
 }
 ?>
 <div class="kc-card mb-3">
@@ -250,9 +252,29 @@ function filterLaporan() {
 }
 </script>
   <?php
-  $omzet_total = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT IFNULL(SUM(total_harga),0) AS n FROM tb_pesanan WHERE status_bayar='lunas' $filter_clause"))['n'];
-  $cnt_lunas   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='lunas' $filter_clause"))['n'];
-  $cnt_belum   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='belum_bayar' $filter_clause"))['n'];
+  if ($has_filter) {
+    $stmt_omzet = mysqli_prepare($koneksi, "SELECT IFNULL(SUM(total_harga),0) AS n FROM tb_pesanan WHERE status_bayar='lunas' AND DATE(tgl_pesanan) BETWEEN ? AND ?");
+    mysqli_stmt_bind_param($stmt_omzet, "ss", $start_date, $end_date);
+    mysqli_stmt_execute($stmt_omzet);
+    $omzet_total = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_omzet))['n'];
+    mysqli_stmt_close($stmt_omzet);
+
+    $stmt_lunas = mysqli_prepare($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='lunas' AND DATE(tgl_pesanan) BETWEEN ? AND ?");
+    mysqli_stmt_bind_param($stmt_lunas, "ss", $start_date, $end_date);
+    mysqli_stmt_execute($stmt_lunas);
+    $cnt_lunas = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_lunas))['n'];
+    mysqli_stmt_close($stmt_lunas);
+
+    $stmt_belum = mysqli_prepare($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='belum_bayar' AND DATE(tgl_pesanan) BETWEEN ? AND ?");
+    mysqli_stmt_bind_param($stmt_belum, "ss", $start_date, $end_date);
+    mysqli_stmt_execute($stmt_belum);
+    $cnt_belum = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_belum))['n'];
+    mysqli_stmt_close($stmt_belum);
+  } else {
+    $omzet_total = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT IFNULL(SUM(total_harga),0) AS n FROM tb_pesanan WHERE status_bayar='lunas'"))['n'];
+    $cnt_lunas   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='lunas'"))['n'];
+    $cnt_belum   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='belum_bayar'"))['n'];
+  }
   ?>
 
   <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
@@ -286,18 +308,27 @@ function filterLaporan() {
       </thead>
       <tbody>
         <?php $no = 1;
-        $q = mysqli_query($koneksi, "SELECT * FROM tb_pesanan ORDER BY id_pesanan DESC");
+        if ($has_filter) {
+          $q_riwayat = mysqli_prepare($koneksi, "SELECT * FROM tb_pesanan WHERE DATE(tgl_pesanan) BETWEEN ? AND ? ORDER BY id_pesanan DESC");
+          mysqli_stmt_bind_param($q_riwayat, "ss", $start_date, $end_date);
+          mysqli_stmt_execute($q_riwayat);
+          $q = mysqli_stmt_get_result($q_riwayat);
+        } else {
+          $q = mysqli_query($koneksi, "SELECT * FROM tb_pesanan ORDER BY id_pesanan DESC");
+        }
         while ($r = mysqli_fetch_assoc($q)): ?>
           <tr>
             <td style="color:#a07850"><?= $no++ ?></td>
-            <td style="font-size:11px;color:#a07850"><?= $r['tgl_pesanan'] ?></td>
+            <td style="font-size:11px;color:#a07850"><?= htmlspecialchars($r['tgl_pesanan']) ?></td>
             <td><?= htmlspecialchars($r['nama_pelanggan']) ?></td>
-            <td>Meja <?= $r['no_meja'] ?></td>
+            <td>Meja <?= intval($r['no_meja']) ?></td>
             <td>Rp <?= number_format($r['total_harga'], 0, ',', '.') ?></td>
-            <td><span class="kc-badge <?= $r['status_bayar'] === 'lunas' ? 'kc-badge-green' : 'kc-badge-yellow' ?>"><?= $r['status_bayar'] ?></span></td>
-            <td><span class="kc-badge <?= $r['status_pesanan'] === 'selesai' ? 'kc-badge-brown' : 'kc-badge-blue' ?>"><?= $r['status_pesanan'] ?></span></td>
+            <td><span class="kc-badge <?= $r['status_bayar'] === 'lunas' ? 'kc-badge-green' : 'kc-badge-yellow' ?>"><?= htmlspecialchars($r['status_bayar']) ?></span></td>
+            <td><span class="kc-badge <?= $r['status_pesanan'] === 'selesai' ? 'kc-badge-brown' : 'kc-badge-blue' ?>"><?= htmlspecialchars($r['status_pesanan']) ?></span></td>
           </tr>
-        <?php endwhile; ?>
+        <?php endwhile;
+        if ($has_filter && isset($q_riwayat)) mysqli_stmt_close($q_riwayat);
+        ?>
       </tbody>
     </table>
 <?php elseif (strtolower($tab) === 'meja'): ?>

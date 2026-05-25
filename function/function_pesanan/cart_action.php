@@ -3,9 +3,14 @@ session_start();
 
 if (isset($_GET['action'])) {
     if ($_GET['action'] == 'add') {
-        $id = $_GET['id'];
-        $nama = $_GET['nama'];
-        $harga = $_GET['harga'];
+        $id = intval($_GET['id'] ?? 0);
+        $nama = htmlspecialchars(trim($_GET['nama'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $harga = intval($_GET['harga'] ?? 0);
+
+        if ($id <= 0 || empty($nama) || $harga <= 0) {
+            header("Location: ../../kasir.php");
+            exit;
+        }
 
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
@@ -21,11 +26,12 @@ if (isset($_GET['action'])) {
             ];
         }
     } else if ($_GET['action'] == 'remove') {
-        $id = $_GET['id'];
+        $id = intval($_GET['id'] ?? 0);
         unset($_SESSION['cart'][$id]);
     } else if ($_GET['action'] == 'clear') {
         unset($_SESSION['cart']);
     }
-    header("Location: ../../pelayanan.php"); //ini kan pelayanan udh ga ada, gmna dong td juga error eehhehee
+    header("Location: ../../kasir.php");
+    exit;
 }
 ?>

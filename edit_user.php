@@ -3,8 +3,8 @@ include 'function/auth.php';
 checkRole(['admin']);
 include 'function/connect.php';
 
-$id = $_GET['id'] ?? 0;
-$query = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$id'");
+$id = intval($_GET['id'] ?? 0);
+$query = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = $id");
 $data = mysqli_fetch_assoc($query);
 if (!$data) {
   header("Location: admin.php");

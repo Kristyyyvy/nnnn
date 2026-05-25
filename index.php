@@ -1,8 +1,12 @@
 <?php
 session_start();
 if (isset($_SESSION['role'])) {
-  header("Location: " . $_SESSION['role'] . ".php");
-  exit;
+  $allowed = ['admin', 'kasir', 'dapur', 'owner'];
+  $role = $_SESSION['role'];
+  if (in_array($role, $allowed)) {
+    header("Location: " . $role . ".php");
+    exit;
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -151,31 +155,31 @@ if (isset($_SESSION['role'])) {
           Demo Akun <span style="font-weight:400;color:#9ca3af">(klik untuk isi form)</span></div>
         <div class="row g-2 justify-content-center">
           <div class="col-6">
-            <div class="demo-chip" onclick="fillLogin('user_owner','1234')">
+            <div class="demo-chip" onclick="fillLogin('Owner','user_owner')">
               <div class="demo-chip-role" style="color:#a16207">Owner</div>
-              <div class="demo-chip-user">user_owner</div>
-              <div class="demo-chip-pass">pass: 1234</div>
+              <div class="demo-chip-user">Owner</div>
+              <div class="demo-chip-pass">pass: user_owner</div>
             </div>
           </div>
           <div class="col-6">
-            <div class="demo-chip" onclick="fillLogin('user_admin','1234')">
+            <div class="demo-chip" onclick="fillLogin('Admin','user_admin')">
               <div class="demo-chip-role" style="color:#92400e">Admin</div>
-              <div class="demo-chip-user">user_admin</div>
-              <div class="demo-chip-pass">pass: 1234</div>
+              <div class="demo-chip-user">Admin</div>
+              <div class="demo-chip-pass">pass: user_admin</div>
             </div>
           </div>
           <div class="col-6">
-            <div class="demo-chip" onclick="fillLogin('user_kasir','1234')">
+            <div class="demo-chip" onclick="fillLogin('Kasir','user_kasir')">
               <div class="demo-chip-role" style="color:#1d4ed8">Kasir</div>
-              <div class="demo-chip-user">user_kasir</div>
-              <div class="demo-chip-pass">pass: 1234</div>
+              <div class="demo-chip-user">Kasir</div>
+              <div class="demo-chip-pass">pass: user_kasir</div>
             </div>
           </div>
           <div class="col-6">
-            <div class="demo-chip" onclick="fillLogin('user_dapur','1234')">
+            <div class="demo-chip" onclick="fillLogin('Dapur','user_dapur')">
               <div class="demo-chip-role" style="color:#059669">Dapur</div>
-              <div class="demo-chip-user">user_dapur</div>
-              <div class="demo-chip-pass">pass: 1234</div>
+              <div class="demo-chip-user">Dapur</div>
+              <div class="demo-chip-pass">pass: user_dapur</div>
             </div>
           </div>
         </div>

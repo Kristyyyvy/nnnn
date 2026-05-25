@@ -4,11 +4,23 @@ include 'function/auth.php';
 checkRole(['kasir']);
 include 'function/connect.php';
 
+// Seed tb_meja jika kosong
+$check_meja = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM tb_meja");
+if ($check_meja) {
+    $meja_count = mysqli_fetch_assoc($check_meja)['total'];
+    if ($meja_count == 0) {
+        for ($i = 1; $i <= 10; $i++) {
+            mysqli_query($koneksi, "INSERT INTO tb_meja (nomor_meja, status) VALUES ($i, 'kosong')");
+        }
+    }
+}
+
 $page_title = 'Transaksi Kasir';
 $active = 'kasir';
 include '_layout.php';
 
 $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY kategori, nama_menu");
+
 ?>
 
 <style>
@@ -111,7 +123,20 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
           </div>
           <div class="col-4">
             <label class="form-label">No. meja</label>
-            <input type="number" id="no_meja" class="form-control form-control-sm" placeholder="0" min="1">
+            <select id="no_meja" class="form-select form-select-sm" required>
+              <option value="">Pilih...</option>
+              <?php
+              $mejas = mysqli_query($koneksi, "SELECT * FROM tb_meja ORDER BY nomor_meja ASC");
+              while ($mj = mysqli_fetch_assoc($mejas)):
+                $is_kosong = $mj['status'] === 'kosong';
+                $color = $is_kosong ? '#16a34a' : '#dc2626';
+                $status = $is_kosong ? 'Kosong' : 'Terisi';
+              ?>
+                <option value="<?= $mj['id_meja'] ?>" style="color: <?= $color ?>; font-weight: bold;">
+                  Meja <?= $mj['nomor_meja'] ?> - <?= $status ?>
+                </option>
+              <?php endwhile; ?>
+            </select>
           </div>
         </div>
       </div>
@@ -335,6 +360,8 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     fd.append('no_meja', meja);
     fd.append('bayar', bayar);
     fd.append('metode_bayar', document.getElementById('metode-bayar').value);
+    fd.append('cart', JSON.stringify(items));
+
 
     const res = await fetch('function/function_pesanan/checkout_kasir.php', {
       method: 'POST',

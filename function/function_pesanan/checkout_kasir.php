@@ -57,6 +57,15 @@ try {
     $id_pesanan = mysqli_insert_id($koneksi);
     mysqli_stmt_close($stmt);
 
+    // Update status meja menjadi terisi
+    $stmtMeja = mysqli_prepare($koneksi, "UPDATE tb_meja SET status = 'terisi' WHERE id_meja = ?");
+    if ($stmtMeja) {
+        mysqli_stmt_bind_param($stmtMeja, 'i', $meja);
+        mysqli_stmt_execute($stmtMeja);
+        mysqli_stmt_close($stmtMeja);
+    }
+
+
     // Insert detail ke tb_detail_pesanan + kurangi stok
     foreach ($cart as $item) {
         $id_menu  = intval($item['id']);

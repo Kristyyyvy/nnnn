@@ -116,7 +116,8 @@ CREATE TABLE `tb_pesanan` (
   `status_pesanan` enum('proses','selesai') NOT NULL,
   `tgl_pesanan` varchar(200) NOT NULL,
   `uang_bayar` int(11) NOT NULL,
-  `nama_kasir` varchar(200) NOT NULL
+  `nama_kasir` varchar(200) NOT NULL,
+  `metode_bayar` enum('tunai','qris','transfer','kartu') NOT NULL DEFAULT 'tunai',
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

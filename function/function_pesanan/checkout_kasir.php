@@ -4,6 +4,10 @@ include '../auth.php';
 checkRole(['kasir']);
 include '../connect.php';
 
+// Added handling for nama_kasir and metode_bayar
+$nama_kasir = $_SESSION['username'] ?? '';
+$metode_bayar = $_POST['metode_bayar'] ?? '';
+
 header('Content-Type: application/json');
 
 $nama  = trim($_POST['nama_pelanggan'] ?? '');
@@ -29,15 +33,26 @@ if ($bayar < $total) {
 mysqli_begin_transaction($koneksi);
 
 try {
+    // Ensure metode_bayar column exists (run once during deployment; optional at runtime)
+    $result = mysqli_query($koneksi, "SHOW COLUMNS FROM tb_pesanan LIKE 'metode_bayar'");
+    if (mysqli_num_rows($result) == 0) {
+        mysqli_query($koneksi, "ALTER TABLE tb_pesanan ADD COLUMN metode_bayar ENUM('tunai','qris','transfer','kartu') NOT NULL DEFAULT 'tunai'");
+    }
+    // Ensure catatan column exists in tb_detail_pesanan
+    $catResult = mysqli_query($koneksi, "SHOW COLUMNS FROM tb_detail_pesanan LIKE 'catatan'");
+    if (mysqli_num_rows($catResult) == 0) {
+        mysqli_query($koneksi, "ALTER TABLE tb_detail_pesanan ADD COLUMN catatan TEXT NULL");
+    }
+    // Set current timestamp for order
     $tgl = date('Y-m-d H:i:s');
 
     // Insert ke tb_pesanan
     $stmt = mysqli_prepare(
         $koneksi,
-        "INSERT INTO tb_pesanan (nama_pelanggan, no_meja, total_harga, status_bayar, status_pesanan, tgl_pesanan)
-         VALUES (?, ?, ?, 'lunas', 'proses', ?)"
+        "INSERT INTO tb_pesanan (nama_pelanggan, no_meja, total_harga, status_bayar, status_pesanan, tgl_pesanan, uang_bayar, nama_kasir, metode_bayar)
+         VALUES (?, ?, ?, 'lunas', 'proses', ?, ?, ?, ?)"
     );
-    mysqli_stmt_bind_param($stmt, 'siis', $nama, $meja, $total, $tgl);
+    mysqli_stmt_bind_param($stmt, 'siisiss', $nama, $meja, $total, $tgl, $bayar, $nama_kasir, $metode_bayar);
     mysqli_stmt_execute($stmt);
     $id_pesanan = mysqli_insert_id($koneksi);
     mysqli_stmt_close($stmt);
@@ -50,9 +65,10 @@ try {
 
         $s2 = mysqli_prepare(
             $koneksi,
-            "INSERT INTO tb_detail_pesanan (id_pesanan, id_menu, jumlah, subtotal) VALUES (?, ?, ?, ?)"
+            "INSERT INTO tb_detail_pesanan (id_pesanan, id_menu, jumlah, subtotal, catatan) VALUES (?, ?, ?, ?, ?)"
         );
-        mysqli_stmt_bind_param($s2, 'iiii', $id_pesanan, $id_menu, $jumlah, $subtotal);
+        $catatan = $item['catatan'] ?? null;
+        mysqli_stmt_bind_param($s2, 'iiiis', $id_pesanan, $id_menu, $jumlah, $subtotal, $catatan);
         mysqli_stmt_execute($s2);
         mysqli_stmt_close($s2);
 

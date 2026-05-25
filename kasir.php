@@ -158,6 +158,13 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
           <span id="total-display" style="color:#92400e">Rp 0</span>
         </div>
 
+        <label class="form-label">Metode Bayar</label>
+        <select id="metode-bayar" class="form-control form-control-sm mb-2">
+          <option value="tunai">Tunai</option>
+          <option value="qris">QRIS</option>
+          <option value="transfer">Transfer</option>
+          <option value="kartu">Kartu</option>
+        </select>
         <label class="form-label">Uang bayar</label>
         <input type="number" id="uang-bayar" class="form-control form-control-sm mb-2" placeholder="0" oninput="hitungKembalian()">
 
@@ -249,6 +256,10 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     renderCart();
   }
 
+  function updateCatatan(id, val) {
+    if (cart[id]) cart[id].catatan = val;
+  }
+
   function renderCart() {
     const list = document.getElementById('cart-list');
     const items = Object.values(cart);
@@ -263,7 +274,10 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     items.forEach(i => {
       const sub = i.harga * i.qty;
       total += sub;
-      html += `<div class="cart-row"><span>${i.nama} ×${i.qty}</span><span style="color:#92400e;font-weight:600">${rp(sub)}</span></div>`;
+      html += `<div class="cart-row">
+        <div class="cart-row-main"><span>${i.nama} ×${i.qty}</span><span style="color:#92400e;font-weight:600">${rp(sub)}</span></div>
+        <input type="text" class="form-control form-control-sm mt-1" placeholder="Catatan..." value="${i.catatan}" oninput="updateCatatan(${i.id}, this.value)">
+      </div>`;
     });
     list.innerHTML = html;
     document.getElementById('total-display').textContent = rp(total);
@@ -320,7 +334,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     fd.append('nama_pelanggan', nama);
     fd.append('no_meja', meja);
     fd.append('bayar', bayar);
-    fd.append('cart', JSON.stringify(items));
+    fd.append('metode_bayar', document.getElementById('metode-bayar').value);
 
     const res = await fetch('function/function_pesanan/checkout_kasir.php', {
       method: 'POST',

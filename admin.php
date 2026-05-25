@@ -222,10 +222,36 @@ include '_layout.php';
 
 <?php elseif ($tab === 'laporan'): ?>
 
+<?php
+// Date filter for laporan
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+$filter_clause = '';
+if ($start_date && $end_date) {
+    $filter_clause = "WHERE tgl_pesanan BETWEEN '$start_date' AND '$end_date'";
+}
+?>
+<div class="kc-card mb-3">
+  <div class="kc-card-body p-3" style="display:flex;gap:8px;align-items:center;">
+    <input type="date" id="start-date" class="form-control form-control-sm" placeholder="Tanggal mulai" value="<?= htmlspecialchars($start_date) ?>"/>
+    <input type="date" id="end-date" class="form-control form-control-sm" placeholder="Tanggal akhir" value="<?= htmlspecialchars($end_date) ?>"/>
+    <button class="btn btn-primary btn-sm" onclick="filterLaporan()">Filter</button>
+  </div>
+</div>
+<script>
+function filterLaporan() {
+  const start = document.getElementById('start-date').value;
+  const end = document.getElementById('end-date').value;
+  const url = new URL(window.location.href);
+  url.searchParams.set('start_date', start);
+  url.searchParams.set('end_date', end);
+  window.location = url.toString();
+}
+</script>
   <?php
-  $omzet_total = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT IFNULL(SUM(total_harga),0) AS n FROM tb_pesanan WHERE status_bayar='lunas'"))['n'];
-  $cnt_lunas   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='lunas'"))['n'];
-  $cnt_belum   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='belum_bayar'"))['n'];
+  $omzet_total = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT IFNULL(SUM(total_harga),0) AS n FROM tb_pesanan WHERE status_bayar='lunas' $filter_clause"))['n'];
+  $cnt_lunas   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='lunas' $filter_clause"))['n'];
+  $cnt_belum   = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_pesanan WHERE status_bayar='belum_bayar' $filter_clause"))['n'];
   ?>
 
   <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">

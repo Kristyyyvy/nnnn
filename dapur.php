@@ -8,7 +8,7 @@ $page_title = 'Antrian Dapur';
 $active = 'dapur';
 include '_layout.php';
 
-$result = mysqli_query($koneksi, "SELECT * FROM tb_pesanan WHERE status_pesanan='proses' ORDER BY id_pesanan ASC");
+$result = mysqli_query($koneksi, "SELECT p.*, m.status AS meja_status FROM tb_pesanan p JOIN tb_meja m ON p.no_meja = m.id_meja WHERE p.status_pesanan='proses' ORDER BY p.id_pesanan ASC");
 $cnt = $result ? mysqli_num_rows($result) : 0;
 ?>
 
@@ -34,29 +34,36 @@ $cnt = $result ? mysqli_num_rows($result) : 0;
 
 <?php else: ?>
 
-    <div class="row g-3">
+<div class="row g-3">
         <?php while ($row = mysqli_fetch_assoc($result)): ?>
             <div class="col-md-6 col-xl-4">
-                <div class="kc-card" style="border-left:3px solid #f59e0b">
+                <?php $border = ($row['meja_status']=='kosong') ? '#28a745' : '#dc3545'; ?>
+                <div class="kc-card" style="border-left:3px solid <?= $border ?>">
                     <div class="kc-card-header" style="background:#fef9c3;border-bottom:1px solid #fef08a">
                         <div>
-                            <div style="font-size:10px;color:#a16207;font-weight:600">Meja <?= $row['no_meja'] ?> &mdash; #<?= $row['id_pesanan'] ?></div>
+                            <?php
+    // Meja line
+    echo '<div style="font-size:10px;color:#a16207;font-weight:600">Meja ' . $row['no_meja'] . ' &mdash; #' . $row['id_pesanan'] . '</div>';
+    // Table status badge
+    $bg = ($row['meja_status'] == 'kosong') ? '#d4edda' : '#f8d7da';
+    $color = ($row['meja_status'] == 'kosong') ? '#155724' : '#721c24';
+    echo '<div style="font-size:10px;color:#a16207;font-weight:600">Status Meja: <span style="padding:2px 6px;border-radius:4px;background:' . $bg . ';color:' . $color . ';">' . htmlspecialchars($row['meja_status']) . '</span></div>';
+?>
                             <div style="font-size:13px;font-weight:700;color:#1c1007"><?= htmlspecialchars($row['nama_pelanggan']) ?></div>
                         </div>
                         <span class="kc-badge kc-badge-yellow">Proses</span>
                     </div>
                     <div class="kc-card-body" style="padding:12px 14px">
                         <?php
-                        $d = mysqli_query($koneksi, "SELECT m.nama_menu, m.kategori, d.jumlah FROM tb_detail_pesanan d JOIN tb_menu m ON d.id_menu=m.id_menu WHERE d.id_pesanan='{$row['id_pesanan']}'");
+                        $d = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah FROM tb_detail_pesanan d WHERE d.id_pesanan='{$row['id_pesanan']}'");
                         while ($item = mysqli_fetch_assoc($d)):
                         ?>
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                                 <div style="width:26px;height:26px;border-radius:50%;background:#fde8cc;color:#7c3a0e;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><?= $item['jumlah'] ?></div>
-                                <div>
-                                    <div style="font-size:12px;font-weight:600;color:#1c1007"><?= htmlspecialchars($item['nama_menu']) ?></div>
-                                    <div style="font-size:10px;color:#a07850"><?= ucfirst($item['kategori']) ?></div>
+                                 <div>
+                                     <div style="font-size:12px;font-weight:600;color:#1c1007">ID Menu: <?= $item['id_menu'] ?></div>
+                                 </div>
                                 </div>
-                            </div>
                         <?php endwhile; ?>
                         <div style="font-size:10px;color:#a07850;margin-top:6px"><?= $row['tgl_pesanan'] ?></div>
                     </div>
@@ -65,6 +72,9 @@ $cnt = $result ? mysqli_num_rows($result) : 0;
                             onclick="return confirm('Pesanan ini sudah siap saji?')"
                             class="btn-kc btn-kc-sm w-100 justify-content-center">
                             <i class='bx bx-check-double'></i> Siap Saji
+                        </a>
+                        <a href="dapur_struk.php?id=<?= $row['id_pesanan'] ?>" target="_blank" class="btn-kc btn-kc-sm w-100 justify-content-center mt-2">
+                            <i class='bx bx-receipt'></i> Struk Dapur
                         </a>
                     </div>
                 </div>

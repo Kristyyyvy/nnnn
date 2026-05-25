@@ -170,6 +170,8 @@ while ($d = mysqli_fetch_assoc($details)) $rows[] = $d;
     <div class="info-row"><span>Tanggal</span><span><?= $pesanan['tgl_pesanan'] ?></span></div>
     <div class="info-row"><span>Pelanggan</span><span><?= htmlspecialchars($pesanan['nama_pelanggan']) ?></span></div>
     <div class="info-row"><span>No. Meja</span><span><?= $pesanan['no_meja'] ?></span></div>
+    <div class="info-row"><span>Nama Kasir</span><span><?= htmlspecialchars($pesanan['nama_kasir']) ?></span></div>
+    <div class="info-row"><span>Metode Bayar</span><span><?= htmlspecialchars($pesanan['metode_bayar'] ?? 'tunai') ?></span></div>
 
     <hr class="garis">
 
@@ -179,6 +181,9 @@ while ($d = mysqli_fetch_assoc($details)) $rows[] = $d;
         <span><?= $d['jumlah'] ?> x Rp <?= number_format($d['harga'], 0, ',', '.') ?></span>
         <span>Rp <?= number_format($d['subtotal'], 0, ',', '.') ?></span>
       </div>
+      <?php if (!empty($d['catatan'])): ?>
+        <div class="item-catatan" style="font-size:10px;color:#555;margin-left:4px;">Catatan: <?= htmlspecialchars($d['catatan']) ?></div>
+      <?php endif; ?>
     <?php endforeach; ?>
 
     <hr class="garis">
@@ -187,6 +192,7 @@ while ($d = mysqli_fetch_assoc($details)) $rows[] = $d;
       <span>Total</span>
       <span>Rp <?= number_format($pesanan['total_harga'], 0, ',', '.') ?></span>
     </div>
+    <div class="info-row"><span>Kembalian</span><span>Rp <?= number_format(($pesanan['uang_bayar'] ?? 0) - ($pesanan['total_harga'] ?? 0),0,',','.') ?></span></div>
     <div class="bayar-row">
       <span>Status</span>
       <span><?= $pesanan['status_bayar'] === 'lunas' ? 'LUNAS' : 'Belum Bayar' ?></span>

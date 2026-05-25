@@ -5,14 +5,15 @@ checkRole(['admin']);
 include 'function/connect.php';
 
 $tab = $_GET['tab'] ?? 'dashboard';
-$page_title = match ($tab) {
+$page_title = match (strtolower($tab)) {
   'menu'    => 'Kelola Menu',
   'user'    => 'Kelola User',
   'pesanan' => 'Pesanan',
   'laporan' => 'Laporan',
+  'meja'    => 'Kelola Meja',
   default   => 'Dashboard',
 };
-$active = $tab === 'dashboard' ? 'dashboard' : $tab;
+$active = strtolower($tab) === 'dashboard' ? 'dashboard' : strtolower($tab);
 include '_layout.php';
 ?>
 
@@ -299,6 +300,116 @@ function filterLaporan() {
         <?php endwhile; ?>
       </tbody>
     </table>
+<?php elseif (strtolower($tab) === 'meja'): ?>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="kc-card">
+        <div class="kc-card-header"><i class='bx bx-plus-circle'></i> Tambah Meja</div>
+        <div class="kc-card-body">
+          <form action="function/function_meja/add_meja.php" method="POST">
+            <div class="mb-3">
+              <label class="form-label">Nomor Meja</label>
+              <input type="number" name="nomor_meja" class="form-control form-control-sm" placeholder="Contoh: 5" min="1" required>
+            </div>
+            <button type="submit" name="add_meja" class="btn-kc btn-kc-sm"><i class='bx bx-save'></i> Simpan</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="kc-card">
+        <div class="kc-card-header"><i class='bx bx-table'></i> Daftar Meja</div>
+        <table class="kc-table w-100">
+          <thead>
+            <tr>
+              <th style="width: 80px;">#</th>
+              <th>Nomor Meja</th>
+              <th>Status</th>
+              <th style="width: 120px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php 
+            $limit = 20;
+            $page = intval($_GET['page'] ?? 1);
+            if ($page < 1) $page = 1;
+            
+            // Hitung total meja
+            $total_query = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM tb_meja");
+            $total_data = mysqli_fetch_assoc($total_query)['total'];
+            $total_pages = ceil($total_data / $limit);
+            if ($total_pages < 1) $total_pages = 1;
+            if ($page > $total_pages) $page = $total_pages;
+            $offset = ($page - 1) * $limit;
+
+            $q = mysqli_query($koneksi, "SELECT * FROM tb_meja ORDER BY nomor_meja ASC LIMIT $limit OFFSET $offset");
+            $no = $offset + 1;
+            while ($d = mysqli_fetch_assoc($q)): 
+              $is_kosong = $d['status'] === 'kosong';
+              $badge_class = $is_kosong ? 'kc-badge-green' : 'kc-badge-red';
+              $status_text = $is_kosong ? 'Kosong' : 'Terisi';
+            ?>
+              <tr>
+                <td style="color:#a07850"><?= $no++ ?></td>
+                <td><strong>Meja <?= htmlspecialchars($d['nomor_meja']) ?></strong></td>
+                <td><span class="kc-badge <?= $badge_class ?>"><?= $status_text ?></span></td>
+                <td>
+                  <a href="function/function_meja/delete_meja.php?id=<?= $d['id_meja'] ?>" class="btn-kc-danger" onclick="return confirm('Hapus Meja <?= $d['nomor_meja'] ?>?')"><i class='bx bx-trash'></i> Hapus</a>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+          </tbody>
+        </table>
+
+        <!-- Custom Styled Pagination -->
+        <style>
+          .pagination .page-link {
+            color: #92400e;
+            background-color: #fff;
+            border: 1px solid #e8d5b8;
+          }
+          .pagination .page-item.active .page-link {
+            background-color: #92400e;
+            border-color: #92400e;
+            color: #fff;
+          }
+          .pagination .page-link:hover {
+            background-color: #fde8cc;
+            border-color: #e8d5b8;
+            color: #7c3a0e;
+          }
+          .pagination .page-item.disabled .page-link {
+            color: #a07850;
+            opacity: 0.6;
+          }
+        </style>
+
+        <?php if ($total_pages > 1): ?>
+          <div class="d-flex justify-content-center p-3 border-top" style="background: #fffcf7;">
+            <nav aria-label="Page navigation">
+              <ul class="pagination pagination-sm m-0">
+                <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                  <a class="page-link" href="admin.php?tab=meja&page=<?= $page - 1 ?>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                  <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                    <a class="page-link" href="admin.php?tab=meja&page=<?= $i ?>"><?= $i ?></a>
+                  </li>
+                <?php endfor; ?>
+                <li class="page-item <?= $page >= $total_pages ? 'disabled' : '' ?>">
+                  <a class="page-link" href="admin.php?tab=meja&page=<?= $page + 1 ?>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
   </div>
 
 <?php endif; ?>

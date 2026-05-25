@@ -355,6 +355,7 @@ $uname = $_SESSION['username'] ?? '';
           <a href="admin.php?tab=menu" class="sb-link <?= ($active ?? '') === 'menu' ? 'active' : '' ?>"><i class='bx bx-dish'></i> Kelola Menu</a>
           <a href="admin.php?tab=user" class="sb-link <?= ($active ?? '') === 'user' ? 'active' : '' ?>"><i class='bx bx-group'></i> Kelola User</a>
           <a href="admin.php?tab=pesanan" class="sb-link <?= ($active ?? '') === 'pesanan' ? 'active' : '' ?>"><i class='bx bx-receipt'></i> Pesanan</a>
+          <a href="admin.php?tab=meja" class="sb-link <?= ($active ?? '') === 'meja' ? 'active' : '' ?>"><i class='bx bx-table'></i> Kelola Meja</a>
           <a href="admin.php?tab=laporan" class="sb-link <?= ($active ?? '') === 'laporan' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan</a>
         </div>
       <?php elseif ($role === 'kasir'): ?>
@@ -366,6 +367,11 @@ $uname = $_SESSION['username'] ?? '';
         <div class="sb-section">Dapur</div>
         <div class="sb-nav">
           <a href="dapur.php" class="sb-link active"><i class='bx bx-bowl-hot'></i> Antrian Masak</a>
+        </div>
+      <?php elseif ($role === 'owner'): ?>
+        <div class="sb-section">Owner</div>
+        <div class="sb-nav">
+          <a href="owner.php" class="sb-link active"><i class='bx bx-bar-chart-alt-2'></i> Laporan & Omzet</a>
         </div>
       <?php endif; ?>
 

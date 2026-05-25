@@ -112,6 +112,12 @@ if (isset($_SESSION['role'])) {
               <div>user_dapur</div>
             </div>
           </div>
+          <div class="col-4">
+            <div class="demo-chip">
+              <div class="demo-chip-role" style="color:#a16207">Owner</div>
+              <div>user_owner</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

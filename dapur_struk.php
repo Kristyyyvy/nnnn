@@ -11,8 +11,15 @@ if (!$pesanan) {
     echo "Pesanan tidak ditemukan.";
     exit;
 }
-// Fetch only id_menu and quantity
-$details = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah FROM tb_detail_pesanan d WHERE d.id_pesanan=$id");
+// Fetch id_menu, quantity, nama_menu, and notes by joining tb_menu
+$details = mysqli_query(
+    $koneksi, 
+    "SELECT d.id_menu, d.jumlah, m.nama_menu, d.catatan 
+     FROM tb_detail_pesanan d 
+     JOIN tb_menu m ON d.id_menu = m.id_menu 
+     WHERE d.id_pesanan = $id"
+);
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -31,7 +38,12 @@ $details = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah FROM tb_detail_pes
     <div class="info"><strong>Meja:</strong> <?= $pesanan['no_meja'] ?></div>
     <hr>
     <?php while ($row = mysqli_fetch_assoc($details)): ?>
-        <div class="item">ID Menu: <?= $row['id_menu'] ?> — Qty: <?= $row['jumlah'] ?></div>
+        <div class="item">
+            <strong><?= htmlspecialchars($row['nama_menu']) ?></strong> — Qty: <?= $row['jumlah'] ?>
+            <?php if (!empty($row['catatan'])): ?>
+                <br><span style="font-size: 11px; color: #555; padding-left: 10px; font-style: italic;">Catatan: <?= htmlspecialchars($row['catatan']) ?></span>
+            <?php endif; ?>
+        </div>
     <?php endwhile; ?>
 </body>
 </html>

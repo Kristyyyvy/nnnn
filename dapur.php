@@ -55,13 +55,16 @@ $cnt = $result ? mysqli_num_rows($result) : 0;
                     </div>
                     <div class="kc-card-body" style="padding:12px 14px">
                         <?php
-                        $d = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah FROM tb_detail_pesanan d WHERE d.id_pesanan='{$row['id_pesanan']}'");
+                        $d = mysqli_query($koneksi, "SELECT d.id_menu, d.jumlah, m.nama_menu, d.catatan FROM tb_detail_pesanan d JOIN tb_menu m ON d.id_menu = m.id_menu WHERE d.id_pesanan='{$row['id_pesanan']}'");
                         while ($item = mysqli_fetch_assoc($d)):
                         ?>
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                                 <div style="width:26px;height:26px;border-radius:50%;background:#fde8cc;color:#7c3a0e;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><?= $item['jumlah'] ?></div>
                                  <div>
-                                     <div style="font-size:12px;font-weight:600;color:#1c1007">ID Menu: <?= $item['id_menu'] ?></div>
+                                     <div style="font-size:12px;font-weight:600;color:#1c1007"><?= htmlspecialchars($item['nama_menu']) ?></div>
+                                     <?php if (!empty($item['catatan'])): ?>
+                                         <div style="font-size:10px;color:#dc2626;font-style:italic;">Catatan: <?= htmlspecialchars($item['catatan']) ?></div>
+                                     <?php endif; ?>
                                  </div>
                                 </div>
                         <?php endwhile; ?>

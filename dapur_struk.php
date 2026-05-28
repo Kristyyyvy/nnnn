@@ -6,7 +6,7 @@ checkRole(['kasir', 'owner', 'admin', 'dapur']);
 include 'function/connect.php';
 
 $id = intval($_GET['id'] ?? 0);
-$pesanan = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id_pesanan, no_meja FROM tb_pesanan WHERE id_pesanan=$id"));
+$pesanan = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM tb_pesanan WHERE id_pesanan=$id"));
 if (!$pesanan) {
     echo "Pesanan tidak ditemukan.";
     exit;
@@ -27,23 +27,131 @@ $details = mysqli_query(
     <meta charset="UTF-8">
     <title>Struk Dapur #<?= $pesanan['id_pesanan'] ?></title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .info { font-size: 14px; margin-bottom: 8px; }
-        .item { font-size: 13px; margin-bottom: 4px; }
-        hr { border: none; border-top: 1px dashed #000; margin: 10px 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: #fff;
+            padding: 0;
+        }
+        .no-print {
+            padding: 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+        }
+        .no-print button,
+        .no-print a {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #fff;
+            text-decoration: none;
+            color: #333;
+            font-family: sans-serif;
+        }
+        .no-print button.cetak {
+            background: #333;
+            color: #fff;
+            border-color: #333;
+        }
+        .struk {
+            width: 300px;
+            margin: 20px auto;
+            padding: 12px;
+            border: 1px dashed #ccc;
+        }
+        .judul {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .garis {
+            border: none;
+            border-top: 1px dashed #000;
+            margin: 6px 0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+        .item {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .item-catatan {
+            font-size: 11px;
+            color: #dc2626; /* Red color for high visibility in kitchen */
+            font-weight: bold;
+            font-style: italic;
+            margin-left: 8px;
+            margin-top: 2px;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                margin: 0;
+            }
+            .struk {
+                margin: 0;
+                width: 100%;
+                border: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="info"><strong>No. Pesanan:</strong> <?= $pesanan['id_pesanan'] ?></div>
-    <div class="info"><strong>Meja:</strong> <?= $pesanan['no_meja'] ?></div>
-    <hr>
-    <?php while ($row = mysqli_fetch_assoc($details)): ?>
-        <div class="item">
-            <strong><?= htmlspecialchars($row['nama_menu']) ?></strong> — Qty: <?= $row['jumlah'] ?>
-            <?php if (!empty($row['catatan'])): ?>
-                <br><span style="font-size: 11px; color: #555; padding-left: 10px; font-style: italic;">Catatan: <?= htmlspecialchars($row['catatan']) ?></span>
-            <?php endif; ?>
+    <div class="no-print">
+        <a href="dapur.php">← Kembali ke Dapur</a>
+        <button class="cetak" onclick="window.print()">🖨 Print Struk</button>
+    </div>
+
+    <div class="struk">
+        <div class="judul">STRUK DAPUR (KITCHEN)</div>
+        <hr class="garis">
+        
+        <div class="info-row"><span>No. Pesanan:</span> <span>#<?= $pesanan['id_pesanan'] ?></span></div>
+        <div class="info-row"><span>Pelanggan:</span> <span><?= htmlspecialchars($pesanan['nama_pelanggan']) ?></span></div>
+        <div class="info-row"><span>No. Meja:</span> <span><?= htmlspecialchars($pesanan['no_meja']) ?></span></div>
+        <div class="info-row"><span>Waktu:</span> <span><?= htmlspecialchars($pesanan['tgl_pesanan']) ?></span></div>
+        
+        <hr class="garis">
+        
+        <?php while ($row = mysqli_fetch_assoc($details)): ?>
+            <div class="item">
+                <div class="item-header">
+                    <span><?= htmlspecialchars($row['nama_menu']) ?></span>
+                    <span>x<?= $row['jumlah'] ?></span>
+                </div>
+                <?php if (!empty($row['catatan'])): ?>
+                    <div class="item-catatan">
+                        Catatan: <?= htmlspecialchars($row['catatan']) ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endwhile; ?>
+        
+        <hr class="garis">
+        <div style="text-align: center; font-size: 10px; margin-top: 8px; color: #555;">
+            Mohon sajikan dengan cepat dan higienis!
         </div>
-    <?php endwhile; ?>
+    </div>
 </body>
 </html>

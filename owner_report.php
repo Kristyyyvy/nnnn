@@ -90,7 +90,7 @@ if (isset($_GET['type'])) {
             <div class="kc-card-body">
                 <h5>Laporan <?= $type === 'day' ? 'Hari' : 'Minggu' ?></h5>
                 <p>Omzet: Rp <?= number_format($data['omzet'],0,',','.') ?></p>
-                <button onclick="window.print()" class="btn btn-secondary">Cetak</button>
+                <a href="owner_report_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn btn-danger"><i class='bx bxs-file-pdf'></i> Cetak / Simpan PDF</a>
             </div>
         </div>
         <?php

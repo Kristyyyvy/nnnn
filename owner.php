@@ -120,7 +120,7 @@ if (isset($_GET['type'])) {
                         <div class="stat-value">Rp <?= number_format($data['omzet'],0,',','.') ?></div>
                     </div>
                 </div>
-                <button onclick="window.print()" class="btn-kc-outline"><i class='bx bx-printer'></i> Cetak Laporan</button>
+                <a href="owner_report_pdf.php?<?= http_build_query($_GET) ?>" target="_blank" class="btn-kc-outline"><i class='bx bxs-file-pdf' style="color:#dc2626;"></i> Cetak / Simpan PDF</a>
             </div>
         </div>
         <?php

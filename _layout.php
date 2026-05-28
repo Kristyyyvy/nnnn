@@ -348,7 +348,7 @@ $uname = $_SESSION['username'] ?? '';
         <div class="sb-brand-sub">POS System</div>
       </div>
 
-      <?php if ($role === 'admin'): ?>
+      <?php if ($role === 'admin' || $role === 'owner'): ?>
         <div class="sb-section">Admin</div>
         <div class="sb-nav">
           <a href="admin.php" class="sb-link <?= ($active ?? '') === 'dashboard' ? 'active' : '' ?>"><i class='bx bx-home-alt'></i> Dashboard</a>
@@ -358,20 +358,26 @@ $uname = $_SESSION['username'] ?? '';
           <a href="admin.php?tab=meja" class="sb-link <?= ($active ?? '') === 'meja' ? 'active' : '' ?>"><i class='bx bx-table'></i> Kelola Meja</a>
           <a href="admin.php?tab=laporan" class="sb-link <?= ($active ?? '') === 'laporan' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan</a>
         </div>
-      <?php elseif ($role === 'kasir'): ?>
+      <?php endif; ?>
+
+      <?php if ($role === 'kasir' || $role === 'owner'): ?>
         <div class="sb-section">Kasir</div>
         <div class="sb-nav">
-          <a href="kasir.php" class="sb-link active"><i class='bx bx-calculator'></i> Transaksi</a>
+          <a href="kasir.php" class="sb-link <?= ($active ?? '') === 'kasir' ? 'active' : '' ?>"><i class='bx bx-calculator'></i> Transaksi</a>
         </div>
-      <?php elseif ($role === 'dapur'): ?>
+      <?php endif; ?>
+
+      <?php if ($role === 'dapur' || $role === 'owner'): ?>
         <div class="sb-section">Dapur</div>
         <div class="sb-nav">
-          <a href="dapur.php" class="sb-link active"><i class='bx bx-bowl-hot'></i> Antrian Masak</a>
+          <a href="dapur.php" class="sb-link <?= ($active ?? '') === 'dapur' ? 'active' : '' ?>"><i class='bx bx-bowl-hot'></i> Antrian Masak</a>
         </div>
-      <?php elseif ($role === 'owner'): ?>
+      <?php endif; ?>
+
+      <?php if ($role === 'owner'): ?>
         <div class="sb-section">Owner</div>
         <div class="sb-nav">
-          <a href="owner.php" class="sb-link active"><i class='bx bx-bar-chart-alt-2'></i> Laporan & Omzet</a>
+          <a href="owner.php" class="sb-link <?= ($active ?? '') === 'owner' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan & Omzet</a>
         </div>
       <?php endif; ?>
 

@@ -1,4 +1,5 @@
-# KristyCrumbs POS 🥐🍰🍔
+# 🥐🍰🍔 ✦ KristyCrumbs POS ✦
+> ｢ A lightweight Point of Sale for your sweet business ｣
 [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%207.4-777bb4.svg?style=flat-square&logo=php)](https://www.php.net/)
 [![Database](https://img.shields.io/badge/Database-MySQL-4479A1.svg?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Frontend](https://img.shields.io/badge/CSS-Bootstrap%20v5.3-7952b3.svg?style=flat-square&logo=bootstrap)](https://getbootstrap.com/)

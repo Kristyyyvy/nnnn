@@ -1,9 +1,10 @@
 # 🥐🍰🍔 ✦ KristyCrumbs POS ✦
-> ｢ A lightweight Point of Sale for your sweet business ｣
-[![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%207.4-777bb4.svg?style=flat-square&logo=php)](https://www.php.net/)
-[![Database](https://img.shields.io/badge/Database-MySQL-4479A1.svg?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Frontend](https://img.shields.io/badge/CSS-Bootstrap%20v5.3-7952b3.svg?style=flat-square&logo=bootstrap)](https://getbootstrap.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+> *｢ From kitchen to cashier, seamlessly ｣*
+
+![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-8892BF?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Database-F29111?style=for-the-badge&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-v5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-brightgreen?style=for-the-badge)
 
 Bilingual technical documentation for **KristyCrumbs POS System**.
 *Dokumentasi teknis dwibahasa untuk **Sistem POS KristyCrumbs**.*

@@ -1,6 +1,22 @@
 <?php
 $role  = $_SESSION['role'] ?? '';
 $uname = $_SESSION['username'] ?? '';
+
+// ─── Deteksi base URL proyek secara dinamis ───────────────────────────────────
+// _layout.php berada di root proyek, pakai __DIR__ untuk bangun path absolut
+$_layout_root  = str_replace('\\', '/', realpath(__DIR__));
+$_doc_root     = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT']));
+$base_url      = rtrim(str_replace($_doc_root, '', $_layout_root), '/');
+if ($base_url === '') $base_url = '';
+
+// ─── Hitung alert stok untuk badge sidebar (hanya admin & owner) ──────────────
+if (($role === 'admin' || $role === 'owner') && !isset($_SESSION['alert_stok'])) {
+    if (isset($koneksi)) {
+        $q_sb_alert = mysqli_query($koneksi, "SELECT COUNT(*) AS n FROM tb_bahan WHERE stok <= stok_minimum");
+        $_SESSION['alert_stok'] = $q_sb_alert ? (int)mysqli_fetch_assoc($q_sb_alert)['n'] : 0;
+    }
+}
+$alert_count = $_SESSION['alert_stok'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -351,40 +367,64 @@ $uname = $_SESSION['username'] ?? '';
       <?php if ($role === 'admin' || $role === 'owner'): ?>
         <div class="sb-section">Admin</div>
         <div class="sb-nav">
-          <a href="admin.php" class="sb-link <?= ($active ?? '') === 'dashboard' ? 'active' : '' ?>"><i class='bx bx-home-alt'></i> Dashboard</a>
-          <a href="admin.php?tab=menu" class="sb-link <?= ($active ?? '') === 'menu' ? 'active' : '' ?>"><i class='bx bx-dish'></i> Kelola Menu</a>
-          <a href="admin.php?tab=user" class="sb-link <?= ($active ?? '') === 'user' ? 'active' : '' ?>"><i class='bx bx-group'></i> Kelola User</a>
-          <a href="admin.php?tab=pesanan" class="sb-link <?= ($active ?? '') === 'pesanan' ? 'active' : '' ?>"><i class='bx bx-receipt'></i> Pesanan</a>
-          <a href="admin.php?tab=meja" class="sb-link <?= ($active ?? '') === 'meja' ? 'active' : '' ?>"><i class='bx bx-table'></i> Kelola Meja</a>
-          <a href="admin.php?tab=laporan" class="sb-link <?= ($active ?? '') === 'laporan' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan</a>
+          <a href="<?= $base_url ?>/admin.php" class="sb-link <?= ($active ?? '') === 'dashboard' ? 'active' : '' ?>"><i class='bx bx-home-alt'></i> Dashboard</a>
+          <a href="<?= $base_url ?>/admin.php?tab=menu" class="sb-link <?= ($active ?? '') === 'menu' ? 'active' : '' ?>"><i class='bx bx-dish'></i> Kelola Menu</a>
+          <a href="<?= $base_url ?>/admin.php?tab=user" class="sb-link <?= ($active ?? '') === 'user' ? 'active' : '' ?>"><i class='bx bx-group'></i> Kelola User</a>
+          <a href="<?= $base_url ?>/admin.php?tab=pesanan" class="sb-link <?= ($active ?? '') === 'pesanan' ? 'active' : '' ?>"><i class='bx bx-receipt'></i> Pesanan</a>
+          <a href="<?= $base_url ?>/admin.php?tab=meja" class="sb-link <?= ($active ?? '') === 'meja' ? 'active' : '' ?>"><i class='bx bx-table'></i> Kelola Meja</a>
+          <a href="<?= $base_url ?>/admin.php?tab=laporan" class="sb-link <?= ($active ?? '') === 'laporan' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan</a>
         </div>
       <?php endif; ?>
 
       <?php if ($role === 'kasir' || $role === 'owner'): ?>
         <div class="sb-section">Kasir</div>
         <div class="sb-nav">
-          <a href="kasir.php" class="sb-link <?= ($active ?? '') === 'kasir' ? 'active' : '' ?>"><i class='bx bx-calculator'></i> Transaksi</a>
+          <a href="<?= $base_url ?>/kasir.php" class="sb-link <?= ($active ?? '') === 'kasir' ? 'active' : '' ?>"><i class='bx bx-calculator'></i> Transaksi</a>
         </div>
       <?php endif; ?>
 
       <?php if ($role === 'dapur' || $role === 'owner'): ?>
         <div class="sb-section">Dapur</div>
         <div class="sb-nav">
-          <a href="dapur.php" class="sb-link <?= ($active ?? '') === 'dapur' ? 'active' : '' ?>"><i class='bx bx-bowl-hot'></i> Antrian Masak</a>
+          <a href="<?= $base_url ?>/dapur.php" class="sb-link <?= ($active ?? '') === 'dapur' ? 'active' : '' ?>"><i class='bx bx-bowl-hot'></i> Antrian Masak</a>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($role === 'admin' || $role === 'owner'): ?>
+        <div class="sb-section">Warehouse</div>
+        <div class="sb-nav">
+          <a href="<?= $base_url ?>/function/function_werehouse/bahan/index.php" class="sb-link <?= ($active ?? '') === 'warehouse' ? 'active' : '' ?>">
+            <i class='bx bx-package'></i> Bahan Baku
+            <?php if ($alert_count > 0): ?>
+              <span style="margin-left:auto;background:#dc2626;color:#fff;border-radius:10px;padding:0 6px;font-size:10px;font-weight:700;min-width:18px;text-align:center;"><?= $alert_count ?></span>
+            <?php endif; ?>
+          </a>
+          <a href="<?= $base_url ?>/function/function_werehouse/alert_stok.php" class="sb-link <?= ($active ?? '') === 'warehouse-alert' ? 'active' : '' ?>">
+            <i class='bx bx-bell<?= $alert_count > 0 ? " bx-tada" : "" ?>'></i> Alert Stok
+            <?php if ($alert_count > 0): ?>
+              <span style="margin-left:auto;background:#dc2626;color:#fff;border-radius:10px;padding:0 6px;font-size:10px;font-weight:700;min-width:18px;text-align:center;"><?= $alert_count ?></span>
+            <?php endif; ?>
+          </a>
+          <a href="<?= $base_url ?>/function/function_werehouse/laporan/index.php" class="sb-link <?= ($active ?? '') === 'warehouse-laporan' ? 'active' : '' ?>">
+            <i class='bx bx-bar-chart-alt-2'></i> Laporan Stok
+          </a>
+          <a href="<?= $base_url ?>/function/function_werehouse/laporan/log.php" class="sb-link <?= ($active ?? '') === 'warehouse-log' ? 'active' : '' ?>">
+            <i class='bx bx-history'></i> Riwayat Log
+          </a>
         </div>
       <?php endif; ?>
 
       <?php if ($role === 'owner'): ?>
         <div class="sb-section">Owner</div>
         <div class="sb-nav">
-          <a href="owner.php" class="sb-link <?= ($active ?? '') === 'owner' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan & Omzet</a>
+          <a href="<?= $base_url ?>/owner.php" class="sb-link <?= ($active ?? '') === 'owner' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan & Omzet</a>
         </div>
       <?php endif; ?>
 
       <div class="sb-foot">
         <div class="sb-user-name"><?= htmlspecialchars($uname) ?></div>
         <div class="sb-user-role"><?= ucfirst($role) ?></div>
-        <a href="function/logout.php" class="btn-logout"><i class='bx bx-log-out'></i> Keluar</a>
+        <a href="<?= $base_url ?>/function/logout.php" class="btn-logout"><i class='bx bx-log-out'></i> Keluar</a>
       </div>
     </div>
 

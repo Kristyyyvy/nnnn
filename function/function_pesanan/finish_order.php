@@ -3,6 +3,9 @@ include '../auth.php';
 checkRole(['dapur', 'admin']);
 include '../connect.php';
 
+// Include fungsi auto kurang stok dari modul warehouse
+include '../function_werehouse/functions/auto_kurang_stok.php';
+
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
 
@@ -28,6 +31,16 @@ if (isset($_GET['id'])) {
     mysqli_stmt_close($stmt);
 
     if ($result) {
+        // ── Integrasi Warehouse: Auto kurangi stok bahan baku ─────────────────
+        // Dipanggil setelah UPDATE status berhasil, dibungkus transaction sendiri
+        $stok_result = autoKurangStok($koneksi, $id);
+
+        if (!$stok_result['success']) {
+            // Stok gagal dikurangi, tapi pesanan tetap selesai — log error saja
+            error_log("[WAREHOUSE] Pesanan #{$id}: " . $stok_result['message']);
+        }
+
+        // Jika ada warning stok minus, tetap redirect normal (pesanan tidak diblock)
         echo "<script>alert('Pesanan telah siap saji!'); window.location='../../dapur.php';</script>";
     } else {
         echo "<script>alert('Gagal memperbarui status pesanan!'); window.location='../../dapur.php';</script>";

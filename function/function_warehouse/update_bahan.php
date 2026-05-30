@@ -34,7 +34,7 @@ if (isset($_POST['update_bahan'])) {
         exit;
     }
 
-    // Stok tidak ikut diupdate di sini — stok hanya berubah lewat stok_masuk, stok_keluar, atau auto_kurang_stok
+    // stok diatur di stok_masuk & stok_keluar
     $stmt = mysqli_prepare($koneksi, "UPDATE tb_bahan SET nama_bahan = ?, kategori = ?, stok_minimum = ?, satuan = ?, harga_modal = ? WHERE id_bahan = ?");
     mysqli_stmt_bind_param($stmt, "ssdsdi", $nama_bahan, $kategori, $stok_minimum, $satuan, $harga_modal, $id_bahan);
     $result = mysqli_stmt_execute($stmt);

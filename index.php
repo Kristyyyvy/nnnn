@@ -18,43 +18,63 @@ if (isset($_SESSION['role'])) {
   <title>Login - KristyCrumbs POS</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body {
-      background: #faf5ee;
-      font-family: sans-serif;
+      background: #fdf9f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .card {
-      border: 1px solid #e8d5b8;
-      border-radius: 4px;
+      border: 1px solid #ece8df;
+      border-radius: 24px;
       background: #fff;
     }
 
     .btn-primary {
-      background: #92400e;
-      border-color: #92400e;
+      background: #964261;
+      border-color: #964261;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px;
     }
 
     .btn-primary:hover,
     .btn-primary:focus {
-      background: #78350f;
-      border-color: #78350f;
+      background: #fdf0f4;
+      border-color: #f48fb1;
+      color: #964261;
+    }
+
+    .form-control {
+      background: #f1eee5;
+      border: 1.5px solid transparent;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+    }
+
+    .form-control:hover {
+      border-color: #f48fb1;
+      background: #fdf0f4;
     }
 
     .form-control:focus {
-      border-color: #92400e;
-      box-shadow: 0 0 0 .15rem rgba(146, 64, 14, .15);
+      border-color: #964261;
+      background: #fff;
+      box-shadow: none;
     }
 
     .brand {
-      color: #92400e;
+      color: #964261;
     }
 
     .demo-chip {
-      background: #fdf5ec;
-      border: 1px solid #e8d5b8;
-      border-radius: 4px;
-      padding: 8px;
+      background: #fff;
+      border: 1px solid #ece8df;
+      border-radius: 18px;
+      padding: 12px 8px;
       text-align: center;
       font-size: 11px;
       cursor: pointer;
@@ -63,10 +83,10 @@ if (isset($_SESSION['role'])) {
     }
 
     .demo-chip:hover {
-      border-color: #92400e;
-      background: #fde8cc;
+      border-color: #f48fb1;
+      background: #fdf0f4;
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(146, 64, 14, 0.08);
+      box-shadow: none;
     }
 
     .demo-chip.copied {
@@ -82,12 +102,12 @@ if (isset($_SESSION['role'])) {
     .demo-chip-user {
       font-family: monospace;
       font-size: 10px;
-      color: #374151;
+      color: #534247;
     }
 
     .demo-chip-pass {
       font-size: 10px;
-      color: #6b7280;
+      color: #867277;
       margin-top: 2px;
     }
 

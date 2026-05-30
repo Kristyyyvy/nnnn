@@ -21,24 +21,12 @@ if (!$data) {
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    :root {
-      --brown: #92400e;
-      --brown-dark: #78350f;
-      --brown-light: #fde8cc;
-      --cream: #faf5ee;
-      --cream-white: #fffcf7;
-      --border: #f5dfc0;
-      --tx: #1c1007;
-      --txm: #6b4c2a;
-      --txl: #b08a62;
-    }
-
     * {
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
-      background: var(--cream);
+      background: #fdf9f0;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -47,93 +35,107 @@ if (!$data) {
     }
 
     .kc-card {
-      background: var(--cream-white);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      box-shadow: 0 4px 20px rgba(146, 64, 14, .08);
+      background: #fff;
+      border: 1px solid #ece8df;
+      border-radius: 24px;
       max-width: 460px;
       width: 100%;
     }
 
     .kc-card-header {
       padding: 14px 20px;
-      border-bottom: 1.5px solid var(--border);
+      border-bottom: 1px solid #ece8df;
       font-size: 14px;
       font-weight: 800;
-      color: var(--tx);
+      color: #1c1c17;
       display: flex;
       align-items: center;
       gap: 8px;
+      border-radius: 24px 24px 0 0;
     }
 
     .kc-card-header i {
       font-size: 18px;
-      color: var(--brown);
+      color: #964261;
     }
 
     .form-label {
       font-size: 10px;
       font-weight: 700;
-      color: var(--txm);
+      color: #534247;
       text-transform: uppercase;
       letter-spacing: .05em;
     }
 
     .form-control,
     .form-select {
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border: 1.5px solid #ece8df;
+      border-radius: 999px;
       font-size: 13px;
-      background: var(--cream-white);
-      color: var(--tx);
+      background: #f1eee5;
+      color: #1c1c17;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .form-control:hover,
+    .form-select:hover {
+      border-color: #f48fb1;
+      background: #fdf0f4;
     }
 
     .form-control:focus,
     .form-select:focus {
-      border-color: var(--brown);
-      box-shadow: 0 0 0 3px rgba(146, 64, 14, .12);
-      background: var(--cream-white);
+      border-color: #964261;
+      box-shadow: 0 0 0 3px rgba(150, 66, 97, .12);
+      background: #fff;
+    }
+
+    .form-select {
+      border-radius: 999px;
+      padding-left: 18px;
     }
 
     .btn-brown {
-      background: var(--brown);
+      background: #964261;
       color: #fff;
-      border: none;
-      border-radius: 8px;
+      border: 1.5px solid #964261;
+      border-radius: 999px;
       font-size: 13px;
       font-weight: 700;
-      padding: 9px 20px;
-      transition: .15s;
+      padding: 10px 22px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
     .btn-brown:hover {
-      background: var(--brown-dark);
-      color: #fff;
+      background: #fdf0f4;
+      color: #964261;
+      border-color: #f48fb1;
     }
 
     .btn-back {
-      background: var(--cream-white);
-      color: var(--txm);
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
+      background: #fff;
+      color: #534247;
+      border: 1px solid #ece8df;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
-      padding: 8px 16px;
+      padding: 7px 16px;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      transition: .15s;
+      transition: border-color 0.15s, background 0.15s;
     }
 
     .btn-back:hover {
-      background: var(--brown-light);
-      color: var(--brown-dark);
+      border-color: #f48fb1;
+      background: #fdf0f4;
+      color: #964261;
     }
 
     .hint {
       font-size: 10px;
-      color: var(--txl);
+      color: #867277;
       font-weight: 400;
       text-transform: none;
       letter-spacing: 0;

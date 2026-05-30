@@ -4,15 +4,14 @@ include 'function/auth.php';
 checkRole(['kasir']);
 include 'function/connect.php';
 
-// Seed tb_meja jika kosong
 $check_meja = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM tb_meja");
 if ($check_meja) {
-    $meja_count = mysqli_fetch_assoc($check_meja)['total'];
-    if ($meja_count == 0) {
-        for ($i = 1; $i <= 10; $i++) {
-            mysqli_query($koneksi, "INSERT INTO tb_meja (nomor_meja, status) VALUES ($i, 'kosong')");
-        }
+  $meja_count = mysqli_fetch_assoc($check_meja)['total'];
+  if ($meja_count == 0) {
+    for ($i = 1; $i <= 10; $i++) {
+      mysqli_query($koneksi, "INSERT INTO tb_meja (nomor_meja, status) VALUES ($i, 'kosong')");
     }
+  }
 }
 
 $page_title = 'Transaksi Kasir';
@@ -20,7 +19,6 @@ $active = 'kasir';
 include '_layout.php';
 
 $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY kategori, nama_menu");
-
 ?>
 
 <style>
@@ -39,33 +37,33 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
 
   .menu-item {
     background: #fff;
-    border: 1px solid #e8d5b8;
+    border: 1px solid #ece8df;
     border-radius: 4px;
     padding: 8px;
     cursor: pointer;
   }
 
   .menu-item.dipilih {
-    border-color: #92400e;
-    background: #fdf5ec;
+    border-color: #964261;
+    background: #fdf0f4;
   }
 
   .menu-kat {
     font-size: 10px;
-    color: #a07850;
+    color: #867277;
     margin-bottom: 2px;
   }
 
   .menu-nm {
     font-size: 12px;
     font-weight: 600;
-    color: #1c1007;
+    color: #1c1c17;
     margin-bottom: 2px;
   }
 
   .menu-harga {
     font-size: 12px;
-    color: #92400e;
+    color: #964261;
     font-weight: 700;
     margin-bottom: 6px;
   }
@@ -79,7 +77,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
   .qty-btn {
     width: 20px;
     height: 20px;
-    border: 1px solid #e8d5b8;
+    border: 1px solid #ece8df;
     border-radius: 3px;
     background: #fff;
     cursor: pointer;
@@ -101,7 +99,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     justify-content: space-between;
     font-size: 11px;
     padding: 4px 0;
-    border-bottom: 1px solid #f5ede3;
+    border-bottom: 1px solid #f1eee5;
   }
 
   .cart-row:last-child {
@@ -159,7 +157,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
               <div class="qty-wrap">
                 <button class="qty-btn" onclick="ubahQty(<?= $m['id_menu'] ?>,-1,event)">−</button>
                 <span class="qty-num" id="qty-<?= $m['id_menu'] ?>">0</span>
-                <button class="qty-btn" style="background:#92400e;color:#fff;border-color:#92400e" onclick="ubahQty(<?= $m['id_menu'] ?>,1,event)">+</button>
+                <button class="qty-btn" style="background:#964261;color:#fff;border-color:#964261" onclick="ubahQty(<?= $m['id_menu'] ?>,1,event)">+</button>
               </div>
             </div>
           <?php endwhile; ?>
@@ -178,9 +176,9 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
           <div style="font-size:11px;color:#a07850;text-align:center;padding:10px 0">Belum ada item</div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;padding:6px 0;border-top:1px solid #e8d5b8;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;padding:6px 0;border-top:1px solid #ece8df;margin-bottom:8px">
           <span>Total</span>
-          <span id="total-display" style="color:#92400e">Rp 0</span>
+          <span id="total-display" style="color:#964261">Rp 0</span>
         </div>
 
         <label class="form-label">Metode Bayar</label>
@@ -200,7 +198,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
         </div>
 
         <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:10px">
-          <span style="color:#a07850">Kembalian</span>
+          <span style="color:#867277">Kembalian</span>
           <span id="kembalian-display" style="font-weight:700;color:#1d4ed8">Rp 0</span>
         </div>
 
@@ -238,8 +236,8 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
       if ($result) while ($r = mysqli_fetch_assoc($result)):
       ?>
         <tr>
-          <td style="color:#a07850"><?= $no++ ?></td>
-          <td style="font-size:11px;color:#a07850"><?= $r['tgl_pesanan'] ?></td>
+          <td style="color:#867277"><?= $no++ ?></td>
+          <td style="font-size:11px;color:#867277"><?= $r['tgl_pesanan'] ?></td>
           <td><?= htmlspecialchars($r['nama_pelanggan']) ?></td>
           <td>Rp <?= number_format($r['total_harga'], 0, ',', '.') ?></td>
           <td><span class="kc-badge kc-badge-green">Lunas</span></td>
@@ -289,7 +287,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     const list = document.getElementById('cart-list');
     const items = Object.values(cart);
     if (items.length === 0) {
-      list.innerHTML = '<div style="font-size:11px;color:#a07850;text-align:center;padding:10px 0">Belum ada item</div>';
+      list.innerHTML = '<div style="font-size:11px;color:#867277;text-align:center;padding:10px 0">Belum ada item</div>';
       document.getElementById('total-display').textContent = rp(0);
       hitungKembalian();
       return;
@@ -300,7 +298,7 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
       const sub = i.harga * i.qty;
       total += sub;
       html += `<div class="cart-row">
-        <div class="cart-row-main"><span>${i.nama} ×${i.qty}</span><span style="color:#92400e;font-weight:600">${rp(sub)}</span></div>
+        <div class="cart-row-main"><span>${i.nama} ×${i.qty}</span><span style="color:#964261;font-weight:600">${rp(sub)}</span></div>
         <input type="text" class="form-control form-control-sm mt-1" placeholder="Catatan..." value="${(i.catatan||'').replace(/"/g,'&quot;')}" oninput="updateCatatan(${i.id}, this.value)">
       </div>`;
     });
@@ -362,7 +360,6 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
     fd.append('metode_bayar', document.getElementById('metode-bayar').value);
     fd.append('cart', JSON.stringify(items));
 
-
     const res = await fetch('function/function_pesanan/checkout_kasir.php', {
       method: 'POST',
       body: fd
@@ -374,7 +371,6 @@ $menus = mysqli_query($koneksi, "SELECT * FROM tb_menu WHERE stok > 0 ORDER BY k
       return;
     }
 
-    // Langsung buka struk 
     alert(`Berhasil!\nTotal: ${rp(data.total)}\nKembalian: ${rp(data.kembalian)}`);
     window.open('print_invoice.php?id=' + data.id_pesanan, '_blank');
 

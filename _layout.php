@@ -11,13 +11,14 @@ $uname = $_SESSION['username'] ?? '';
   <title><?= $page_title ?? 'KristyCrumbs' ?> - KristyCrumbs POS</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
-      font-family: sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
-      background: #faf5ee;
+      background: #fdf9f0;
       margin: 0;
     }
 
@@ -31,9 +32,9 @@ $uname = $_SESSION['username'] ?? '';
     }
 
     .sidebar {
-      width: 190px;
+      width: 200px;
       background: #fff;
-      border-right: 1px solid #e8d5b8;
+      border-right: 1px solid #ece8df;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -43,84 +44,101 @@ $uname = $_SESSION['username'] ?? '';
     }
 
     .sb-brand {
-      padding: 12px 14px;
-      border-bottom: 1px solid #e8d5b8;
+      padding: 16px 16px 14px;
+      border-bottom: 1px solid #ece8df;
     }
 
     .sb-brand-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1c1007;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1c1c17;
+      letter-spacing: -0.01em;
     }
 
     .sb-brand-name span {
-      color: #92400e;
+      color: #964261;
     }
 
     .sb-brand-sub {
       font-size: 10px;
-      color: #a07850;
+      color: #867277;
+      margin-top: 1px;
     }
 
     .sb-section {
-      padding: 10px 14px 4px;
+      padding: 12px 16px 4px;
       font-size: 10px;
-      color: #a07850;
+      color: #867277;
       text-transform: uppercase;
-      letter-spacing: .05em;
+      letter-spacing: .06em;
+      font-weight: 700;
     }
 
     .sb-nav {
-      padding: 4px 8px;
+      padding: 2px 8px;
     }
 
     .sb-link {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 10px;
-      color: #5a3a1a;
+      padding: 7px 10px;
+      color: #534247;
       font-size: 12px;
-      border-radius: 3px;
+      font-weight: 500;
+      border-radius: 999px;
       margin-bottom: 1px;
+      transition: background 0.15s, color 0.15s;
     }
 
     .sb-link i {
-      font-size: 14px;
+      font-size: 15px;
+    }
+
+    .sb-link:hover {
+      background: #f7f3ea;
+      color: #964261;
     }
 
     .sb-link.active {
       background: #fde8cc;
-      color: #7c3a0e;
-      font-weight: 600;
+      color: #964261;
+      font-weight: 700;
     }
 
     .sb-foot {
       margin-top: auto;
-      padding: 10px 14px;
-      border-top: 1px solid #e8d5b8;
+      padding: 12px 16px;
+      border-top: 1px solid #ece8df;
     }
 
     .sb-user-name {
       font-size: 12px;
-      font-weight: 600;
-      color: #1c1007;
+      font-weight: 700;
+      color: #1c1c17;
     }
 
     .sb-user-role {
       font-size: 10px;
-      color: #a07850;
-      margin-bottom: 6px;
+      color: #867277;
+      margin-bottom: 8px;
     }
 
     .btn-logout {
-      display: inline-block;
-      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
       border: 1px solid #fca5a5;
-      border-radius: 3px;
+      border-radius: 999px;
       color: #dc2626;
       font-size: 11px;
       font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    .btn-logout:hover {
+      background: #fee2e2;
     }
 
     .main-wrap {
@@ -132,73 +150,78 @@ $uname = $_SESSION['username'] ?? '';
 
     .topbar {
       background: #fff;
-      border-bottom: 1px solid #e8d5b8;
-      padding: 8px 16px;
+      border-bottom: 1px solid #ece8df;
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
     .topbar-title {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
-      color: #1c1007;
+      color: #1c1c17;
     }
 
     .topbar-sub {
-      font-size: 10px;
-      color: #a07850;
+      font-size: 11px;
+      color: #867277;
     }
 
     .page-content {
-      padding: 16px;
+      padding: 20px;
     }
 
     .kc-card {
       background: #fff;
-      border: 1px solid #e8d5b8;
-      border-radius: 4px;
-      margin-bottom: 14px;
+      border: 1px solid #ece8df;
+      border-radius: 16px;
+      margin-bottom: 16px;
     }
 
     .kc-card-header {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e8d5b8;
+      padding: 10px 16px;
+      border-bottom: 1px solid #ece8df;
       font-weight: 700;
       font-size: 12px;
-      color: #1c1007;
+      color: #1c1c17;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border-radius: 16px 16px 0 0;
     }
 
     .kc-card-header i {
-      color: #92400e;
-      font-size: 14px;
+      color: #964261;
+      font-size: 15px;
       margin-right: 4px;
     }
 
     .kc-card-body {
-      padding: 12px;
+      padding: 14px 16px;
     }
 
     .kc-table thead th {
       background: #fdf5ec;
-      color: #7c3a0e;
+      color: #964261;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .04em;
-      padding: 6px 10px;
-      border-bottom: 1px solid #e8d5b8;
+      padding: 8px 12px;
+      border-bottom: 1px solid #ece8df;
     }
 
     .kc-table tbody td {
-      padding: 7px 10px;
-      border-bottom: 1px solid #fdf5ec;
+      padding: 9px 12px;
+      border-bottom: 1px solid #f7f3ea;
       font-size: 12px;
       vertical-align: middle;
-      color: #1c1007;
+      color: #1c1c17;
+    }
+
+    .kc-table tbody tr:hover {
+      background: #fdf9f0;
     }
 
     .kc-table tbody tr:last-child td {
@@ -206,8 +229,8 @@ $uname = $_SESSION['username'] ?? '';
     }
 
     .kc-badge {
-      border-radius: 3px;
-      padding: 2px 6px;
+      border-radius: 999px;
+      padding: 3px 10px;
       font-size: 10px;
       font-weight: 700;
       display: inline-block;
@@ -244,81 +267,105 @@ $uname = $_SESSION['username'] ?? '';
     }
 
     .btn-kc {
-      background: #92400e;
-      border: 1px solid #92400e;
+      background: #964261;
+      border: 1px solid #964261;
       color: #fff;
-      border-radius: 3px;
-      padding: 5px 10px;
+      border-radius: 999px;
+      padding: 6px 14px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .btn-kc:hover {
+      background: #fdf0f4;
+      color: #964261;
+      border-color: #f48fb1;
     }
 
     .btn-kc-sm {
-      padding: 3px 8px;
+      padding: 4px 10px;
       font-size: 11px;
     }
 
     .btn-kc-outline {
       background: #fff;
-      border: 1px solid #e8d5b8;
-      color: #5a3a1a;
-      border-radius: 3px;
-      padding: 3px 8px;
+      border: 1px solid #ece8df;
+      color: #534247;
+      border-radius: 999px;
+      padding: 4px 10px;
       font-size: 11px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .btn-kc-outline:hover {
+      border-color: #f48fb1;
+      background: #fdf0f4;
+      color: #964261;
     }
 
     .btn-kc-danger {
       background: #fff;
       border: 1px solid #fca5a5;
       color: #dc2626;
-      border-radius: 3px;
-      padding: 3px 8px;
+      border-radius: 999px;
+      padding: 4px 10px;
       font-size: 11px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      transition: background 0.15s;
+    }
+
+    .btn-kc-danger:hover {
+      background: #fee2e2;
     }
 
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .stat-box {
       background: #fff;
-      border: 1px solid #e8d5b8;
-      border-radius: 4px;
-      padding: 10px 12px;
+      border: 1px solid #ece8df;
+      border-radius: 16px;
+      padding: 14px 16px;
+      transition: border-color 0.15s;
+    }
+
+    .stat-box:hover {
+      border-color: #f48fb1;
     }
 
     .stat-label {
       font-size: 10px;
-      color: #a07850;
+      color: #867277;
       text-transform: uppercase;
-      letter-spacing: .04em;
-      font-weight: 600;
-      margin-bottom: 3px;
+      letter-spacing: .05em;
+      font-weight: 700;
+      margin-bottom: 6px;
     }
 
     .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: #92400e;
+      font-size: 22px;
+      font-weight: 800;
+      color: #964261;
     }
 
     .stat-value.dark {
-      color: #1c1007;
+      color: #1c1c17;
     }
 
     .stat-value.blue {
@@ -328,13 +375,13 @@ $uname = $_SESSION['username'] ?? '';
     .form-label {
       font-size: 12px;
       font-weight: 600;
-      color: #5a3a1a;
+      color: #534247;
     }
 
     .form-control:focus,
     .form-select:focus {
-      border-color: #92400e;
-      box-shadow: 0 0 0 .15rem rgba(146, 64, 14, .15);
+      border-color: #964261;
+      box-shadow: 0 0 0 .15rem rgba(150, 66, 97, .12);
     }
   </style>
 </head>

@@ -12,7 +12,7 @@ $uname = $_SESSION['username'] ?? '';
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
+  <style> 
     * {
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
@@ -418,6 +418,16 @@ $uname = $_SESSION['username'] ?? '';
         <div class="sb-section">Dapur</div>
         <div class="sb-nav">
           <a href="dapur.php" class="sb-link <?= ($active ?? '') === 'dapur' ? 'active' : '' ?>"><i class='bx bx-bowl-hot'></i> Antrian Masak</a>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($role === 'admin' || $role === 'owner'): ?>
+        <div class="sb-section">Werehouse</div>
+        <div class="sb-nav">
+          <a href="function/function_warehouse/bahan/index.php" class="sb-link <?= ($active ?? '') === 'werehouse' ? 'active' : '' ?>"><i class='bx bx-package'></i> Bahan Baku</a>
+          <a href="" class="sb-link <?= ($active ?? '') === 'alert_werehouse' ? 'active' : '' ?>"><i class='bx bx-bell'></i>Alert Stok</a>
+          <a href="" class="sb-link <?= ($active ?? '') === 'laporan_werehouse' ? 'active' : '' ?>"><i class='bx bx-bar-chart-alt-2'></i> Laporan Stok</a>
+          <a href="" class="sb-link <?= ($active ?? '') === 'log_werehouse' ? 'active' : '' ?>"><i class='bx bx-history'></i> Riwayat Log</a>
         </div>
       <?php endif; ?>
 

@@ -4,47 +4,28 @@ include '../../auth.php';
 checkRole(['admin', 'owner']);
 include '../../connect.php';
 
-$page_title = 'Edit Bahan Baku';
+$page_title = 'Tambah Bahan Baku';
 $active     = 'warehouse';
 
 $errors = [];
+$form   = [
+    'nama_bahan'   => '',
+    'kategori'     => '',
+    'stok'         => '',
+    'stok_minimum' => '',
+    'satuan'       => '',
+    'harga_modal'  => '',
+];
 
 // kategori bahan buat cafe bakery
 $kategori_list = ['bahan_baku', 'minuman', 'topping', 'kemasan'];
 
-// ambil data bahan berdasarkan id
-if (!isset($_GET['id']) || intval($_GET['id']) <= 0) {
-    header("Location: index.php");
-    exit;
-}
-
-$id_bahan = intval($_GET['id']);
-$stmt_get = mysqli_prepare($koneksi, "SELECT * FROM tb_bahan WHERE id_bahan = ?");
-mysqli_stmt_bind_param($stmt_get, 'i', $id_bahan);
-mysqli_stmt_execute($stmt_get);
-$res   = mysqli_stmt_get_result($stmt_get);
-$bahan = mysqli_fetch_assoc($res);
-mysqli_stmt_close($stmt_get);
-
-if (!$bahan) {
-    header("Location: index.php");
-    exit;
-}
-
-// isi form dari data existing
-$form = [
-    'nama_bahan'   => $bahan['nama_bahan'],
-    'kategori'     => $bahan['kategori'],
-    'stok_minimum' => $bahan['stok_minimum'],
-    'satuan'       => $bahan['satuan'],
-    'harga_modal'  => $bahan['harga_modal'],
-];
-
 // proses submit
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bahan'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_bahan'])) {
     // ambil input
     $form['nama_bahan']   = trim($_POST['nama_bahan'] ?? '');
     $form['kategori']     = trim($_POST['kategori'] ?? '');
+    $form['stok']         = trim($_POST['stok'] ?? '');
     $form['stok_minimum'] = trim($_POST['stok_minimum'] ?? '');
     $form['satuan']       = trim($_POST['satuan'] ?? '');
     $form['harga_modal']  = trim($_POST['harga_modal'] ?? '');
@@ -55,6 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bahan'])) {
     }
     if (!in_array($form['kategori'], $kategori_list)) {
         $errors['kategori'] = 'Pilih kategori yang valid.';
+    }
+    if ($form['stok'] === '' || !is_numeric($form['stok'])) {
+        $errors['stok'] = 'Stok awal wajib diisi (angka).';
+    } elseif ((float)$form['stok'] < 0) {
+        $errors['stok'] = 'Stok tidak boleh negatif.';
     }
     if ($form['stok_minimum'] === '' || !is_numeric($form['stok_minimum'])) {
         $errors['stok_minimum'] = 'Stok minimum wajib diisi (angka).';
@@ -74,21 +60,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bahan'])) {
     if (empty($errors)) {
         $nama_bahan   = $form['nama_bahan'];
         $kategori     = $form['kategori'];
+        $stok         = (float) $form['stok'];
         $stok_minimum = (float) $form['stok_minimum'];
         $satuan       = $form['satuan'];
         $harga_modal  = (float) $form['harga_modal'];
 
-        // stok tidak diubah di sini, diatur lewat stok_masuk & stok_keluar
-        $stmt = mysqli_prepare($koneksi, "UPDATE tb_bahan SET nama_bahan = ?, kategori = ?, stok_minimum = ?, satuan = ?, harga_modal = ? WHERE id_bahan = ?");
-        mysqli_stmt_bind_param($stmt, 'ssdsdi', $nama_bahan, $kategori, $stok_minimum, $satuan, $harga_modal, $id_bahan);
-        $result = mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+        // insert bahan + log harus atomik
+        mysqli_begin_transaction($koneksi);
+        try {
+            // insert bahan baru
+            $stmt_insert = mysqli_prepare(
+                $koneksi,
+                "INSERT INTO tb_bahan (nama_bahan, kategori, stok, stok_minimum, satuan, harga_modal)
+                 VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            mysqli_stmt_bind_param($stmt_insert, 'ssddsd', $nama_bahan, $kategori, $stok, $stok_minimum, $satuan, $harga_modal);
+            mysqli_stmt_execute($stmt_insert);
+            $id_bahan_baru = mysqli_insert_id($koneksi);
+            mysqli_stmt_close($stmt_insert);
 
-        if ($result) {
-            header("Location: index.php?success=Bahan+" . urlencode($nama_bahan) . "+berhasil+diperbarui");
+            // log stok awal
+            $keterangan_awal = "Stok awal saat tambah bahan";
+            $stmt_log = mysqli_prepare(
+                $koneksi,
+                "INSERT INTO tb_stok_log (id_bahan, jenis, jumlah, keterangan)
+                 VALUES (?, 'masuk', ?, ?)"
+            );
+            mysqli_stmt_bind_param($stmt_log, 'ids', $id_bahan_baru, $stok, $keterangan_awal);
+            mysqli_stmt_execute($stmt_log);
+            mysqli_stmt_close($stmt_log);
+
+            // refresh session alert stok
+            $q_alert = mysqli_query($koneksi, "SELECT COUNT(*) AS total_menipis FROM tb_bahan WHERE stok <= stok_minimum");
+            $_SESSION['alert_stok'] = (int) mysqli_fetch_assoc($q_alert)['total_menipis'];
+
+            mysqli_commit($koneksi);
+            header("Location: index.php?success=Bahan+" . urlencode($nama_bahan) . "+berhasil+ditambahkan");
             exit;
-        } else {
-            $errors['global'] = 'Gagal memperbarui bahan.';
+        } catch (Exception $e) {
+            mysqli_rollback($koneksi);
+            $errors['global'] = 'Gagal menyimpan bahan: ' . $e->getMessage();
         }
     }
 }
@@ -114,10 +125,10 @@ include '../../../_layout.php';
     <div class="col-md-7 col-lg-6">
         <div class="kc-card">
             <div class="kc-card-header">
-                <span><i class='bx bx-edit'></i> Form Edit Bahan Baku</span>
+                <span><i class='bx bx-plus-circle'></i> Form Tambah Bahan Baku</span>
             </div>
             <div class="kc-card-body">
-                <form method="POST" id="form-edit-bahan" novalidate>
+                <form method="POST" id="form-tambah-bahan" novalidate>
                     <!-- Nama Bahan -->
                     <div class="mb-3">
                         <label class="form-label" for="nama_bahan">Nama Bahan <span style="color:#964261">*</span></label>
@@ -154,20 +165,38 @@ include '../../../_layout.php';
                         <?php endif; ?>
                     </div>
 
-                    <!-- Satuan -->
-                    <div class="mb-3">
-                        <label class="form-label" for="satuan">Satuan <span style="color:#964261">*</span></label>
-                        <input
-                            type="text"
-                            id="satuan"
-                            name="satuan"
-                            class="form-control form-control-sm <?= isset($errors['satuan']) ? 'is-invalid' : '' ?>"
-                            value="<?= htmlspecialchars($form['satuan']) ?>"
-                            placeholder="kg / pcs"
-                            required>
-                        <?php if (isset($errors['satuan'])): ?>
-                            <div class="invalid-feedback"><?= $errors['satuan'] ?></div>
-                        <?php endif; ?>
+                    <!-- Stok Awal & Satuan (satu baris) -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-8">
+                            <label class="form-label" for="stok">Stok Awal <span style="color:#964261">*</span></label>
+                            <input
+                                type="number"
+                                id="stok"
+                                name="stok"
+                                step="0.01"
+                                min="0"
+                                class="form-control form-control-sm <?= isset($errors['stok']) ? 'is-invalid' : '' ?>"
+                                value="<?= htmlspecialchars($form['stok']) ?>"
+                                placeholder="0"
+                                required>
+                            <?php if (isset($errors['stok'])): ?>
+                                <div class="invalid-feedback"><?= $errors['stok'] ?></div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="satuan">Satuan <span style="color:#964261">*</span></label>
+                            <input
+                                type="text"
+                                id="satuan"
+                                name="satuan"
+                                class="form-control form-control-sm <?= isset($errors['satuan']) ? 'is-invalid' : '' ?>"
+                                value="<?= htmlspecialchars($form['satuan']) ?>"
+                                placeholder="kg / pcs"
+                                required>
+                            <?php if (isset($errors['satuan'])): ?>
+                                <div class="invalid-feedback"><?= $errors['satuan'] ?></div>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
                     <!-- Stok Minimum -->
@@ -211,8 +240,8 @@ include '../../../_layout.php';
 
                     <!-- Tombol Aksi -->
                     <div style="display:flex;gap:8px;margin-top:16px;">
-                        <button type="submit" name="update_bahan" class="btn-kc btn-kc-sm" id="btn-update-bahan">
-                            <i class='bx bx-save'></i> Simpan Perubahan
+                        <button type="submit" name="simpan_bahan" class="btn-kc btn-kc-sm" id="btn-simpan-bahan">
+                            <i class='bx bx-save'></i> Simpan Bahan
                         </button>
                         <a href="index.php" class="btn-kc-outline">
                             <i class='bx bx-arrow-back'></i> Batal
@@ -228,7 +257,7 @@ include '../../../_layout.php';
         <div class="kc-card">
             <div class="kc-card-header"><i class='bx bx-info-circle'></i> Info</div>
             <div class="kc-card-body" style="font-size:12px;color:#534247;line-height:1.7;">
-                <p>• <strong>Stok</strong> tidak bisa diubah di sini, gunakan menu stok masuk atau stok keluar.</p>
+                <p>• <strong>Stok Awal</strong> akan otomatis tercatat sebagai log <em>masuk</em> pertama.</p>
                 <p>• <strong>Stok Minimum</strong> digunakan untuk trigger notifikasi bahan hampir habis.</p>
                 <p>• Gunakan satuan yang sesuai, misal: gr, kg, ml, liter, pcs, lembar.</p>
                 <p>• Harga modal digunakan untuk menghitung nilai stok pada laporan.</p>
